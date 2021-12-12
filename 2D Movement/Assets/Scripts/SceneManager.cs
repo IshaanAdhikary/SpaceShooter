@@ -6,6 +6,7 @@ using UnityEngine.InputSystem;
 public class SceneManager : MonoBehaviour
 {
     public GameObject star;
+    public Vector2 playSize;
 
     private PlayerInputManager inputManager;
     private Camera mainCamera;
@@ -21,12 +22,13 @@ public class SceneManager : MonoBehaviour
 
     private void Start()
     {
-        int clusterCount = Random.Range(120, 150);
+        int areaSize = Mathf.RoundToInt(playSize.x * playSize.y);
+        int clusterCount = Random.Range(Mathf.RoundToInt(areaSize / 10), Mathf.RoundToInt(areaSize / 8));
 
         for (int i = 0; i < clusterCount; i++)
         {
-            float xPos = Random.Range(-19f, 19f);
-            float yPos = Random.Range(-14f, 14f);
+            float xPos = Random.Range(-playSize.x/2 + 1, playSize.x/2 - 1);
+            float yPos = Random.Range(-playSize.y/2 + 1, playSize.y/2 - 1);
             float scale = Random.Range(0.6f, 1f);
 
             GameObject genStar = Instantiate(star, new Vector3(xPos, yPos), Quaternion.identity);

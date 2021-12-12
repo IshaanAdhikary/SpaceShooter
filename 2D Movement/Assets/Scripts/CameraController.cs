@@ -8,6 +8,7 @@ public class CameraController : MonoBehaviour
     public GameObject player2;
 
     private Vector2 velocity;
+    private float sizeVelocity;
     private Camera cam;
 
     private void Start()
@@ -27,10 +28,10 @@ public class CameraController : MonoBehaviour
             transform.position = new Vector3(Pos2D.x, Pos2D.y, transform.position.z);
 
             // Camera Scale
-            float playerDistance = Vector2.Distance(player1.transform.position, player2.transform.position);
-            float camSize = Mathf.Clamp(playerDistance / 1.5f, 8, 15.5f);
+            float playerDistance = Mathf.Max(Mathf.Abs(player1.transform.position.x - player2.transform.position.x), Mathf.Abs(player1.transform.position.y - player2.transform.position.y) * cam.aspect);
+            float camSize = Mathf.Clamp(playerDistance / 2.4f, 7f, 18f);
 
-            cam.orthographicSize = camSize;
+            cam.orthographicSize = Mathf.SmoothDamp(cam.orthographicSize, camSize, ref sizeVelocity, 0.4f);
         }
     }
 }
