@@ -3,22 +3,33 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.InputSystem;
+using UnityEngine.SceneManagement;
 
 public class PlayerMovement : MonoBehaviour
 {
+    public RoundManager GameScript;
     public GameObject bulletTemplate;
     public GameObject canvas;
     public GameObject HealthBar;
+
+    public int playerNum;
+
     public float ROFMulti;
     public float speedMulti;
     public float healthMulti;
+
     public float Health;
+
+    public bool isWinner;
+    public bool isDead;
 
     private Image healthImage;
     private Camera cam;
     private CharacterController2D controller;
+    private CameraController cameraScript;
     private Vector2 moveDirection = Vector2.zero;
     private Vector2 shootDirection = Vector2.zero;
+
     private float startingHealth = 100f;
     private float shotTimer = 0f;
     private float baseMoveSpeed = 8f;
@@ -27,8 +38,9 @@ public class PlayerMovement : MonoBehaviour
 
     void Awake()
     {
-        controller = GetComponent<CharacterController2D>();
         cam = Camera.main;
+        controller = GetComponent<CharacterController2D>();
+        cameraScript = cam.GetComponent<CameraController>();
         canvas.GetComponent<Canvas>().worldCamera = cam;
         healthImage = HealthBar.GetComponent<Image>();
         Health = startingHealth * healthMulti;
@@ -39,7 +51,12 @@ public class PlayerMovement : MonoBehaviour
         healthImage.fillAmount = Health / startingHealth;
         if (Health <= 0)
         {
-            Destroy(gameObject);
+            Die();
+        }
+
+        if (cameraScript.players.Count == 1 && cameraScript.players.Contains(gameObject) && GameScript.P2)
+        {
+            GameScript.Win(gameObject, playerNum);
         }
     }
 
@@ -56,14 +73,6 @@ public class PlayerMovement : MonoBehaviour
             }
             shotTimer += Time.fixedDeltaTime;
         }
-
-        float xClamp = Mathf.Clamp(transform.position.x,
-            cam.ScreenToWorldPoint(Vector3.zero).x + (transform.localScale.x * 1.33f / 2),
-            cam.ScreenToWorldPoint(new Vector3 (cam.pixelWidth, 0, 0)).x - (transform.localScale.x * 1.3f / 2));
-        float yClamp = Mathf.Clamp(transform.position.y,
-            cam.ScreenToWorldPoint(Vector3.zero).y + (transform.localScale.y * 1.33f/ 2),
-            cam.ScreenToWorldPoint(new Vector3(0, cam.pixelHeight, 0)).y - (transform.localScale.y * 1.3f / 2));
-        transform.position = new Vector2 (xClamp, yClamp);
     }
 
     private void ShootGun()
@@ -75,6 +84,12 @@ public class PlayerMovement : MonoBehaviour
         script.velocity = (shootDirection) * (bulletROF * ROFMulti)/25f;
     }
 
+    private void Die()
+    {
+        cameraScript.removeFromCam(gameObject);
+        gameObject.SetActive(false);
+    }
+
     public void Shoot(InputAction.CallbackContext context)
     {
         shootDirection = context.ReadValue<Vector2>().normalized;
@@ -83,5 +98,14 @@ public class PlayerMovement : MonoBehaviour
     public void Move(InputAction.CallbackContext context)
     {
         moveDirection = context.ReadValue<Vector2>();
+    }
+    
+    public void Continue(InputAction.CallbackContext context)
+    {
+        if (isWinner)
+        {
+            Scene scene = SceneManager.GetActiveScene();
+            SceneManager.LoadScene(scene.name);
+        }
     }
 }

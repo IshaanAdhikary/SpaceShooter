@@ -2,22 +2,29 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using TMPro;
 
-public class SceneManager : MonoBehaviour
+public class RoundManager : MonoBehaviour
 {
     public GameObject star;
+    public GameObject winTextObj;
     public Vector2 playSize;
+    public bool P2 = false;
 
     private PlayerInputManager inputManager;
     private Camera mainCamera;
     private CameraController cameraScript;
+    private TextMeshProUGUI winText;
     private int playerCount = 0;
+
+    private Color[] playerColors = new Color[4] {new Color(0.5f, 1, 0.87f), new Color(1, 0.5f, 0.5f), new Color(1, 1, 0.5f), new Color(0.5f, 1, 0.5f) };
 
     private void Awake()
     {
         mainCamera = Camera.main;
         inputManager = GetComponent<PlayerInputManager>();
         cameraScript = mainCamera.GetComponent<CameraController>();
+        winText = winTextObj.GetComponent<TextMeshProUGUI>();
     }
 
     private void Start()
@@ -40,20 +47,35 @@ public class SceneManager : MonoBehaviour
     public void OnPlayerJoined(PlayerInput playerInput)
     {
         playerCount++;
+
         SpriteRenderer playerSprite = playerInput.GetComponent<SpriteRenderer>();
+        PlayerMovement playerMovement = playerInput.GetComponent<PlayerMovement>();
+
+        playerMovement.GameScript = this;
 
         switch (playerCount)
         {
-            case 1:
-                playerInput.name = "Player1";
-                cameraScript.player1 = playerInput.gameObject;
-                break;
             case 2:
-                playerInput.name = "Player2";
-                playerSprite.color = new Color(1, 0.47f, 0.53f);
-                cameraScript.player2 = playerInput.gameObject;
+                P2 = true;
+                break;
+            case 4:
                 inputManager.DisableJoining();
                 break;
         }
+
+        playerInput.name = "Player " + playerCount.ToString();
+        playerSprite.color = playerColors[playerCount - 1];
+        playerMovement.playerNum = playerCount;
+        cameraScript.addToCam(playerInput.gameObject);
+    }
+
+    public void Win(GameObject winner, int winNumber)
+    {
+        PlayerMovement winnersScript = winner.GetComponent<PlayerMovement>();
+        winnersScript.isWinner = true;
+
+        winTextObj.SetActive(true);
+        winText.color = playerColors[winNumber - 1];
+        winText.text = winner.name + " wins!";
     }
 }

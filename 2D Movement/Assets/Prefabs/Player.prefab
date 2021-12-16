@@ -232,14 +232,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d771866b411d25e4e8e85037ac869ca5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  GameScript: {fileID: 0}
   bulletTemplate: {fileID: 3832614287624771217, guid: 9c161392c48603c41a98b70e92da16db,
     type: 3}
   canvas: {fileID: 8808386730896939236}
   HealthBar: {fileID: 7186059453924161279}
+  playerNum: 0
   ROFMulti: 1
   speedMulti: 1
   healthMulti: 1
   Health: 0
+  isDead: 0
 --- !u!114 &-2399658157651222652
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -336,7 +339,22 @@ MonoBehaviour:
         m_CallState: 2
     m_ActionId: 1541428f-5a99-47c9-9e9d-9be7e18b4dc9
     m_ActionName: Player/Shoot[/XInputControllerWindows/rightStick,/XInputControllerWindows/rightStick]
-  m_NeverAutoSwitchControlSchemes: 0
+  - m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 6782456285251830602}
+        m_MethodName: Continue
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+    m_ActionId: 50087743-c405-44c1-9c55-4fbd6e12af17
+    m_ActionName: Player/Continue[/XInputControllerWindows/buttonSouth,/XInputControllerWindows/buttonSouth]
+  m_NeverAutoSwitchControlSchemes: 1
   m_DefaultControlScheme: Gamepad
   m_DefaultActionMap: Player
   m_SplitScreenIndex: -1
