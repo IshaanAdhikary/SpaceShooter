@@ -19,16 +19,21 @@ public class BulletScript : MonoBehaviour
     {
         rb.velocity = velocity;
     }
+
     private void OnTriggerEnter2D(Collider2D col)
     {
-        if (col.gameObject.CompareTag("Wall"))
+        if (col.CompareTag("Wall"))
         {
             Destroy(gameObject);
         }
-        else if (col.gameObject.CompareTag("Player") && firedBy != col.gameObject.name)
+        else if (col.CompareTag("Player") && firedBy != col.gameObject.name)
         {
             PlayerMovement script = col.GetComponent<PlayerMovement>();
             script.Health -= damage;
+            Rigidbody2D playerRB = col.GetComponent<Rigidbody2D>();
+            Vector3 relativeBullet = transform.position - col.transform.position;
+            playerRB.AddForceAtPosition(rb.velocity * 0.8f, transform.position - relativeBullet * 0.5f);
+
             Destroy(gameObject);
         }
     }

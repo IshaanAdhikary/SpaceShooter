@@ -7,7 +7,7 @@ using UnityEngine.SceneManagement;
 
 public class PlayerMovement : MonoBehaviour
 {
-    public RoundManager GameScript;
+    public RoundManager gameScript;
     public GameObject bulletTemplate;
     public GameObject canvas;
     public GameObject HealthBar;
@@ -27,6 +27,7 @@ public class PlayerMovement : MonoBehaviour
     private Camera cam;
     private CharacterController2D controller;
     private CameraController cameraScript;
+    private PlayerInput playerInput;
     private Vector2 moveDirection = Vector2.zero;
     private Vector2 shootDirection = Vector2.zero;
 
@@ -39,9 +40,14 @@ public class PlayerMovement : MonoBehaviour
     void Awake()
     {
         cam = Camera.main;
+        playerInput = GetComponent<PlayerInput>();
         controller = GetComponent<CharacterController2D>();
         cameraScript = cam.GetComponent<CameraController>();
         canvas.GetComponent<Canvas>().worldCamera = cam;
+    }
+
+    private void Start()
+    {
         healthImage = HealthBar.GetComponent<Image>();
         Health = startingHealth * healthMulti;
     }
@@ -54,9 +60,11 @@ public class PlayerMovement : MonoBehaviour
             Die();
         }
 
-        if (cameraScript.players.Count == 1 && cameraScript.players.Contains(gameObject) && GameScript.P2)
+        canvas.transform.position = transform.position;
+
+        if (cameraScript.players.Count == 1 && cameraScript.players.Contains(gameObject) && gameScript.P2)
         {
-            GameScript.Win(gameObject, playerNum);
+            gameScript.Win(gameObject, playerNum);
         }
     }
 
@@ -87,6 +95,7 @@ public class PlayerMovement : MonoBehaviour
     private void Die()
     {
         cameraScript.removeFromCam(gameObject);
+        canvas.SetActive(false);
         gameObject.SetActive(false);
     }
 
@@ -100,9 +109,9 @@ public class PlayerMovement : MonoBehaviour
         moveDirection = context.ReadValue<Vector2>();
     }
     
-    public void Continue(InputAction.CallbackContext context)
+    public void Continue()
     {
-        if (isWinner)
+        if (gameScript.gameEnded)
         {
             Scene scene = SceneManager.GetActiveScene();
             SceneManager.LoadScene(scene.name);

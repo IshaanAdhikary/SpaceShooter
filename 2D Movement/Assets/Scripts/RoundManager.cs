@@ -9,6 +9,7 @@ public class RoundManager : MonoBehaviour
     public GameObject star;
     public GameObject winTextObj;
     public Vector2 playSize;
+    public bool gameEnded = false;
     public bool P2 = false;
 
     private PlayerInputManager inputManager;
@@ -17,6 +18,7 @@ public class RoundManager : MonoBehaviour
     private TextMeshProUGUI winText;
     private int playerCount = 0;
 
+    // Delete this later
     private Color[] playerColors = new Color[4] {new Color(0.5f, 1, 0.87f), new Color(1, 0.5f, 0.5f), new Color(1, 1, 0.5f), new Color(0.5f, 1, 0.5f) };
 
     private void Awake()
@@ -48,11 +50,15 @@ public class RoundManager : MonoBehaviour
     {
         playerCount++;
 
-        SpriteRenderer playerSprite = playerInput.GetComponent<SpriteRenderer>();
-        PlayerMovement playerMovement = playerInput.GetComponent<PlayerMovement>();
+        GameObject player = playerInput.gameObject.transform.GetChild(0).gameObject;
+        SpriteRenderer playerSprite = player.GetComponent<SpriteRenderer>();
+        PlayerMovement playerMovement = player.GetComponent<PlayerMovement>();
 
-        playerMovement.GameScript = this;
+        playerMovement.gameScript = this;
 
+        playerInput.currentActionMap = playerInput.actions.FindActionMap("Player");
+
+        // Delete this later
         switch (playerCount)
         {
             case 2:
@@ -63,10 +69,12 @@ public class RoundManager : MonoBehaviour
                 break;
         }
 
-        playerInput.name = "Player " + playerCount.ToString();
+        string objName = "Player " + playerCount.ToString();
+        playerInput.name = objName;
+        player.name = objName + " Body";
         playerSprite.color = playerColors[playerCount - 1];
         playerMovement.playerNum = playerCount;
-        cameraScript.addToCam(playerInput.gameObject);
+        cameraScript.addToCam(player);
     }
 
     public void Win(GameObject winner, int winNumber)
@@ -76,6 +84,10 @@ public class RoundManager : MonoBehaviour
 
         winTextObj.SetActive(true);
         winText.color = playerColors[winNumber - 1];
-        winText.text = winner.name + " wins!";
+        winText.text = winner.transform.parent.gameObject.name + " wins!";
+        gameEnded = true;
+
+        // Delete this later
+        inputManager.DisableJoining();
     }
 }

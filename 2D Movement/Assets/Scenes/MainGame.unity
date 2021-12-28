@@ -606,7 +606,7 @@ MonoBehaviour:
       m_SingletonActionBindings: []
     m_Reference: {fileID: 3543137997692273706, guid: bb7f8cc39bb036e4689427882ddbe0db,
       type: 3}
-  m_PlayerPrefab: {fileID: 7808490747842785179, guid: 34d5edb9a7fe5ca4eb170c95e4f733e2,
+  m_PlayerPrefab: {fileID: 1314270404785019759, guid: 12ed6f8bef1f89d4e887ea1e95cf5a73,
     type: 3}
   m_SplitScreen: 0
   m_MaintainAspectRatioInSplitScreen: 0
@@ -632,6 +632,7 @@ MonoBehaviour:
   star: {fileID: 6349329666489393604, guid: 950240da9730f8344952a577eb33bd5d, type: 3}
   winTextObj: {fileID: 96374546}
   playSize: {x: 90, y: 60}
+  gameEnded: 0
   P2: 0
 --- !u!1 &519420028
 GameObject:
