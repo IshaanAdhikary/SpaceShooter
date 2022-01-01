@@ -157,12 +157,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   gameScript: {fileID: 0}
+  pauseTint: {fileID: 0}
   bulletTemplate: {fileID: 3832614287624771217, guid: 9c161392c48603c41a98b70e92da16db,
     type: 3}
   canvas: {fileID: 1314270404915383447}
   HealthBar: {fileID: 1314270404004998815}
-  playerNum: 0
+  theme: {r: 0, g: 0, b: 0, a: 0}
   ROFMulti: 1
+  damageMulti: 0
   speedMulti: 1
   healthMulti: 1
   Health: 0
@@ -343,7 +345,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 1314270403862652367}
         m_MethodName: Continue
-        m_Mode: 0
+        m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
@@ -354,6 +356,25 @@ MonoBehaviour:
         m_CallState: 2
     m_ActionId: 50087743-c405-44c1-9c55-4fbd6e12af17
     m_ActionName: Player/Continue[/XInputControllerWindows/buttonSouth,/XInputControllerWindows/buttonSouth]
+  - m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 1314270403862652367}
+        m_MethodName: Pause
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+    m_ActionId: e04a364e-9628-47cd-9994-036fd4a2fc85
+    m_ActionName: Player/Pause[/XInputControllerWindows/start,/XInputControllerWindows/start]
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: 2d08e146-1d5e-42d9-92be-839906b47b06
+    m_ActionName: UI/Cancel[/XInputControllerWindows/buttonEast,/XInputControllerWindows/buttonEast]
   m_NeverAutoSwitchControlSchemes: 1
   m_DefaultControlScheme: 
   m_DefaultActionMap: Player

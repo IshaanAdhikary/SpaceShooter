@@ -3,15 +3,17 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.InputSystem.UI;
 using UnityEngine.SceneManagement;
 
 public class PlayerConfigManager : MonoBehaviour
 {
+    private PlayerInputManager manager;
     private List<PlayerConfiguration> playerConfigs;
 
-    [SerializeField]
-    private int MaxPlayers = 4;
-
+    public static Dictionary<int, InputDevice> playerControllers = new Dictionary<int, InputDevice>();
+    public static Dictionary<int, Color> playerColors = new Dictionary<int, Color>();
+    public static GameObject[] playerMenus;
     public static PlayerConfigManager Instance { get; private set; }
 
     private void Awake()
@@ -25,21 +27,40 @@ public class PlayerConfigManager : MonoBehaviour
             Instance = this;
             DontDestroyOnLoad(Instance);
             playerConfigs = new List<PlayerConfiguration>();
+            manager = GetComponent<PlayerInputManager>();
         }
-    }
-
-    public void SetPlayerColor(int index, Color color)
-    {
-        playerConfigs[index].PlayerColor = color;
     }
 
     public void ReadyPlayer(int index)
     {
         playerConfigs[index].isReady = true;
+
+        // If all players are ready, load next scene.
         if (playerConfigs.Count >= 2 && playerConfigs.All(p => p.isReady))
         {
+            playerMenus = GameObject.FindGameObjectsWithTag("PlayerMenuSelect");
+
+            playerControllers.Clear();
+
+            for (int i = 0; i < playerMenus.Length; i++)
+            {
+                PlayerInput playerInputComponent = playerMenus[i].GetComponent<PlayerInput>();
+                PlayerSetupMenuController scrip = playerMenus[i].GetComponent<PlayerSetupMenuController>();
+
+                int playerIndex = playerInputComponent.playerIndex;
+
+                playerControllers.Add(playerIndex, playerInputComponent.devices[0]);
+                playerColors.Add(playerIndex, scrip.colorsIndex[scrip.currentColorIndex]);
+            }
+
+            manager.enabled = false;
             SceneManager.LoadScene("MainGame");
         }
+    }
+
+    public void UnReadyPlayer(int index)
+    {
+        playerConfigs[index].isReady = false;
     }
 
     public void HandlePlayerJoin(PlayerInput pi)

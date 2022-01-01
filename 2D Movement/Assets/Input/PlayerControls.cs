@@ -35,6 +35,14 @@ public class @PlayerControls : IInputActionCollection, IDisposable
                     ""interactions"": """"
                 },
                 {
+                    ""name"": ""Pause"",
+                    ""type"": ""Button"",
+                    ""id"": ""e04a364e-9628-47cd-9994-036fd4a2fc85"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """"
+                },
+                {
                     ""name"": ""Continue"",
                     ""type"": ""Button"",
                     ""id"": ""50087743-c405-44c1-9c55-4fbd6e12af17"",
@@ -76,6 +84,17 @@ public class @PlayerControls : IInputActionCollection, IDisposable
                     ""action"": ""Continue"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""d9f0aa3a-2fba-4d63-941e-544851dee497"",
+                    ""path"": ""<Gamepad>/start"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Gamepad"",
+                    ""action"": ""Pause"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         },
@@ -95,6 +114,14 @@ public class @PlayerControls : IInputActionCollection, IDisposable
                     ""name"": ""Submit"",
                     ""type"": ""PassThrough"",
                     ""id"": ""07a14ced-1c6d-4aac-a61c-3e1fdf258fd2"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """"
+                },
+                {
+                    ""name"": ""Cancel"",
+                    ""type"": ""PassThrough"",
+                    ""id"": ""2d08e146-1d5e-42d9-92be-839906b47b06"",
                     ""expectedControlType"": ""Button"",
                     ""processors"": """",
                     ""interactions"": """"
@@ -375,6 +402,17 @@ public class @PlayerControls : IInputActionCollection, IDisposable
                     ""action"": ""Submit"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""bdabd9be-6a6b-4b4a-90ee-7d2b7f2ba764"",
+                    ""path"": ""<Gamepad>/buttonEast"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Gamepad"",
+                    ""action"": ""Cancel"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -446,11 +484,13 @@ public class @PlayerControls : IInputActionCollection, IDisposable
         m_Player = asset.FindActionMap("Player", throwIfNotFound: true);
         m_Player_Move = m_Player.FindAction("Move", throwIfNotFound: true);
         m_Player_Shoot = m_Player.FindAction("Shoot", throwIfNotFound: true);
+        m_Player_Pause = m_Player.FindAction("Pause", throwIfNotFound: true);
         m_Player_Continue = m_Player.FindAction("Continue", throwIfNotFound: true);
         // UI
         m_UI = asset.FindActionMap("UI", throwIfNotFound: true);
         m_UI_Navigate = m_UI.FindAction("Navigate", throwIfNotFound: true);
         m_UI_Submit = m_UI.FindAction("Submit", throwIfNotFound: true);
+        m_UI_Cancel = m_UI.FindAction("Cancel", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -502,6 +542,7 @@ public class @PlayerControls : IInputActionCollection, IDisposable
     private IPlayerActions m_PlayerActionsCallbackInterface;
     private readonly InputAction m_Player_Move;
     private readonly InputAction m_Player_Shoot;
+    private readonly InputAction m_Player_Pause;
     private readonly InputAction m_Player_Continue;
     public struct PlayerActions
     {
@@ -509,6 +550,7 @@ public class @PlayerControls : IInputActionCollection, IDisposable
         public PlayerActions(@PlayerControls wrapper) { m_Wrapper = wrapper; }
         public InputAction @Move => m_Wrapper.m_Player_Move;
         public InputAction @Shoot => m_Wrapper.m_Player_Shoot;
+        public InputAction @Pause => m_Wrapper.m_Player_Pause;
         public InputAction @Continue => m_Wrapper.m_Player_Continue;
         public InputActionMap Get() { return m_Wrapper.m_Player; }
         public void Enable() { Get().Enable(); }
@@ -525,6 +567,9 @@ public class @PlayerControls : IInputActionCollection, IDisposable
                 @Shoot.started -= m_Wrapper.m_PlayerActionsCallbackInterface.OnShoot;
                 @Shoot.performed -= m_Wrapper.m_PlayerActionsCallbackInterface.OnShoot;
                 @Shoot.canceled -= m_Wrapper.m_PlayerActionsCallbackInterface.OnShoot;
+                @Pause.started -= m_Wrapper.m_PlayerActionsCallbackInterface.OnPause;
+                @Pause.performed -= m_Wrapper.m_PlayerActionsCallbackInterface.OnPause;
+                @Pause.canceled -= m_Wrapper.m_PlayerActionsCallbackInterface.OnPause;
                 @Continue.started -= m_Wrapper.m_PlayerActionsCallbackInterface.OnContinue;
                 @Continue.performed -= m_Wrapper.m_PlayerActionsCallbackInterface.OnContinue;
                 @Continue.canceled -= m_Wrapper.m_PlayerActionsCallbackInterface.OnContinue;
@@ -538,6 +583,9 @@ public class @PlayerControls : IInputActionCollection, IDisposable
                 @Shoot.started += instance.OnShoot;
                 @Shoot.performed += instance.OnShoot;
                 @Shoot.canceled += instance.OnShoot;
+                @Pause.started += instance.OnPause;
+                @Pause.performed += instance.OnPause;
+                @Pause.canceled += instance.OnPause;
                 @Continue.started += instance.OnContinue;
                 @Continue.performed += instance.OnContinue;
                 @Continue.canceled += instance.OnContinue;
@@ -551,12 +599,14 @@ public class @PlayerControls : IInputActionCollection, IDisposable
     private IUIActions m_UIActionsCallbackInterface;
     private readonly InputAction m_UI_Navigate;
     private readonly InputAction m_UI_Submit;
+    private readonly InputAction m_UI_Cancel;
     public struct UIActions
     {
         private @PlayerControls m_Wrapper;
         public UIActions(@PlayerControls wrapper) { m_Wrapper = wrapper; }
         public InputAction @Navigate => m_Wrapper.m_UI_Navigate;
         public InputAction @Submit => m_Wrapper.m_UI_Submit;
+        public InputAction @Cancel => m_Wrapper.m_UI_Cancel;
         public InputActionMap Get() { return m_Wrapper.m_UI; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -572,6 +622,9 @@ public class @PlayerControls : IInputActionCollection, IDisposable
                 @Submit.started -= m_Wrapper.m_UIActionsCallbackInterface.OnSubmit;
                 @Submit.performed -= m_Wrapper.m_UIActionsCallbackInterface.OnSubmit;
                 @Submit.canceled -= m_Wrapper.m_UIActionsCallbackInterface.OnSubmit;
+                @Cancel.started -= m_Wrapper.m_UIActionsCallbackInterface.OnCancel;
+                @Cancel.performed -= m_Wrapper.m_UIActionsCallbackInterface.OnCancel;
+                @Cancel.canceled -= m_Wrapper.m_UIActionsCallbackInterface.OnCancel;
             }
             m_Wrapper.m_UIActionsCallbackInterface = instance;
             if (instance != null)
@@ -582,6 +635,9 @@ public class @PlayerControls : IInputActionCollection, IDisposable
                 @Submit.started += instance.OnSubmit;
                 @Submit.performed += instance.OnSubmit;
                 @Submit.canceled += instance.OnSubmit;
+                @Cancel.started += instance.OnCancel;
+                @Cancel.performed += instance.OnCancel;
+                @Cancel.canceled += instance.OnCancel;
             }
         }
     }
@@ -635,11 +691,13 @@ public class @PlayerControls : IInputActionCollection, IDisposable
     {
         void OnMove(InputAction.CallbackContext context);
         void OnShoot(InputAction.CallbackContext context);
+        void OnPause(InputAction.CallbackContext context);
         void OnContinue(InputAction.CallbackContext context);
     }
     public interface IUIActions
     {
         void OnNavigate(InputAction.CallbackContext context);
         void OnSubmit(InputAction.CallbackContext context);
+        void OnCancel(InputAction.CallbackContext context);
     }
 }

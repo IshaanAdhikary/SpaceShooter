@@ -8,13 +8,14 @@ using UnityEngine.SceneManagement;
 public class PlayerMovement : MonoBehaviour
 {
     public RoundManager gameScript;
+    public GameObject pauseTint;
     public GameObject bulletTemplate;
     public GameObject canvas;
     public GameObject HealthBar;
-
-    public int playerNum;
+    public Color theme;
 
     public float ROFMulti;
+    public float damageMulti;
     public float speedMulti;
     public float healthMulti;
 
@@ -27,7 +28,6 @@ public class PlayerMovement : MonoBehaviour
     private Camera cam;
     private CharacterController2D controller;
     private CameraController cameraScript;
-    private PlayerInput playerInput;
     private Vector2 moveDirection = Vector2.zero;
     private Vector2 shootDirection = Vector2.zero;
 
@@ -40,7 +40,6 @@ public class PlayerMovement : MonoBehaviour
     void Awake()
     {
         cam = Camera.main;
-        playerInput = GetComponent<PlayerInput>();
         controller = GetComponent<CharacterController2D>();
         cameraScript = cam.GetComponent<CameraController>();
         canvas.GetComponent<Canvas>().worldCamera = cam;
@@ -54,17 +53,17 @@ public class PlayerMovement : MonoBehaviour
 
     private void Update()
     {
+        canvas.transform.position = transform.position;
+
         healthImage.fillAmount = Health / startingHealth;
         if (Health <= 0)
         {
             Die();
         }
 
-        canvas.transform.position = transform.position;
-
-        if (cameraScript.players.Count == 1 && cameraScript.players.Contains(gameObject) && gameScript.P2)
+        if (cameraScript.players.Count == 1 && cameraScript.players.Contains(gameObject))
         {
-            gameScript.Win(gameObject, playerNum);
+            gameScript.Win(gameObject);
         }
     }
 
@@ -76,14 +75,14 @@ public class PlayerMovement : MonoBehaviour
         {
             if (shotTimer >= 60 / (bulletROF * ROFMulti))
             {
-                ShootGun();
+                ShootSmall();
                 shotTimer = 0f;
             }
             shotTimer += Time.fixedDeltaTime;
         }
     }
 
-    private void ShootGun()
+    private void ShootSmall()
     {
         GameObject bullet = Instantiate(bulletTemplate, transform.position + new Vector3(shootDirection.x, shootDirection.y, 0), Quaternion.identity);
         BulletScript script = bullet.GetComponent<BulletScript>();
@@ -107,6 +106,12 @@ public class PlayerMovement : MonoBehaviour
     public void Move(InputAction.CallbackContext context)
     {
         moveDirection = context.ReadValue<Vector2>();
+    }
+
+    public void Pause()
+    {
+        if (pauseTint) { pauseTint.SetActive(true); }
+        Time.timeScale = 0f;
     }
     
     public void Continue()

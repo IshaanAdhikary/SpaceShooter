@@ -1,25 +1,26 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 using UnityEngine.InputSystem;
 using TMPro;
 
 public class RoundManager : MonoBehaviour
 {
+    public GameObject playerPrefab;
     public GameObject star;
     public GameObject winTextObj;
+    public GameObject pauseTint;
     public Vector2 playSize;
     public bool gameEnded = false;
-    public bool P2 = false;
 
+    private List<Transform> playerSpawns;
     private PlayerInputManager inputManager;
     private Camera mainCamera;
     private CameraController cameraScript;
     private TextMeshProUGUI winText;
-    private int playerCount = 0;
 
     // Delete this later
-    private Color[] playerColors = new Color[4] {new Color(0.5f, 1, 0.87f), new Color(1, 0.5f, 0.5f), new Color(1, 1, 0.5f), new Color(0.5f, 1, 0.5f) };
 
     private void Awake()
     {
@@ -27,10 +28,24 @@ public class RoundManager : MonoBehaviour
         inputManager = GetComponent<PlayerInputManager>();
         cameraScript = mainCamera.GetComponent<CameraController>();
         winText = winTextObj.GetComponent<TextMeshProUGUI>();
+
+        playerSpawns = GetChildren();
+    }
+
+    private List<Transform> GetChildren()
+    {
+        List<Transform> spawns = new List<Transform>();
+
+        foreach (Transform child in transform)
+        {
+            spawns.Add(child);
+        }
+        return spawns;
     }
 
     private void Start()
     {
+        // Make a Randomly Generated BG of Stars.
         int areaSize = Mathf.RoundToInt(playSize.x * playSize.y);
         int clusterCount = Random.Range(Mathf.RoundToInt(areaSize / 10), Mathf.RoundToInt(areaSize / 8));
 
@@ -44,50 +59,49 @@ public class RoundManager : MonoBehaviour
             genStar.transform.localScale = new Vector2(scale, scale);
             genStar.transform.parent = gameObject.transform;
         }
+
+        SpawnPlayers();
     }
 
-    public void OnPlayerJoined(PlayerInput playerInput)
+    private void SpawnPlayers()
     {
-        playerCount++;
-
-        GameObject player = playerInput.gameObject.transform.GetChild(0).gameObject;
-        SpriteRenderer playerSprite = player.GetComponent<SpriteRenderer>();
-        PlayerMovement playerMovement = player.GetComponent<PlayerMovement>();
-
-        playerMovement.gameScript = this;
-
-        playerInput.currentActionMap = playerInput.actions.FindActionMap("Player");
-
-        // Delete this later
-        switch (playerCount)
+        foreach (var player in PlayerConfigManager.playerControllers)
         {
-            case 2:
-                P2 = true;
-                break;
-            case 4:
-                inputManager.DisableJoining();
-                break;
-        }
+            InputDevice controller = PlayerConfigManager.playerControllers[player.Key];
 
-        string objName = "Player " + playerCount.ToString();
-        playerInput.name = objName;
-        player.name = objName + " Body";
-        playerSprite.color = playerColors[playerCount - 1];
-        playerMovement.playerNum = playerCount;
-        cameraScript.addToCam(player);
+            PlayerInput playerInput = PlayerInput.Instantiate(playerPrefab, player.Key, "Gamepad", -1, controller);
+
+            GameObject playerBody = playerInput.gameObject.transform.GetChild(0).gameObject;
+            SpriteRenderer playerSprite = playerBody.GetComponent<SpriteRenderer>();
+            PlayerMovement playerMovement = playerBody.GetComponent<PlayerMovement>();
+
+            Color color = PlayerConfigManager.playerColors[player.Key];
+
+            playerInput.gameObject.transform.position = playerSpawns[player.Key].position;
+            playerSprite.color = color;
+
+            // Set player script variables
+            playerMovement.gameScript = this;
+            playerMovement.pauseTint = pauseTint;
+            playerMovement.theme = color;
+
+            playerInput.currentActionMap = playerInput.actions.FindActionMap("Player");
+
+            string objName = "Player " + (player.Key + 1).ToString();
+            playerInput.name = objName;
+            playerBody.name = objName + " Body";
+            cameraScript.addToCam(playerBody);
+        }
     }
 
-    public void Win(GameObject winner, int winNumber)
+    public void Win(GameObject winner)
     {
         PlayerMovement winnersScript = winner.GetComponent<PlayerMovement>();
         winnersScript.isWinner = true;
 
         winTextObj.SetActive(true);
-        winText.color = playerColors[winNumber - 1];
+        winText.color = winnersScript.theme;
         winText.text = winner.transform.parent.gameObject.name + " wins!";
         gameEnded = true;
-
-        // Delete this later
-        inputManager.DisableJoining();
     }
 }
